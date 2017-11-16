@@ -9,13 +9,13 @@ var highlightRange = (function () {
 //     string: the CSS class the text pieces in the range should get, defaults to 'highlighted-range'
 //     HTMLElement: an element that will be cloned for each highlight
 //     function: a function that creates a wrapper node. It's passed the Node that's being
-//               highligted (but is free to ignore it). This can be used to apply properties 
-//               to a logical highlight, even if it's spread over many elements, for example
-//               to store an annotation identifier to be able to query for all highlight
-//               spans for the same annotation:
+//               highligted and the zero-based index of the current portion of the highlight. 
+//               This can be used to apply properties to a logical highlight, even if it's 
+//               spread over many elements, for example to store an annotation identifier to 
+//               be able to query for all highlight spans for the same annotation:
 //               
 //                 function renderAnnotation(annotation, range) {
-//                   highlightRange(range, function() {
+//                   highlightRange(range, function(node, index) {
 //                     var span = document.createElement('span');
 //                     span.classList.add('annotation');
 //                     span.dataset.annotationId = annotation.id;
@@ -42,7 +42,7 @@ function highlightRange(rangeObject, highlightTemplate) {
     // Highlight each node
     var highlights = [];
     for (var nodeIdx in nodes) {
-        highlights.push(highlightNode(nodes[nodeIdx], highlightCallback));
+        highlights.push(highlightNode(nodes[nodeIdx], nodeIdx, highlightCallback));
     }
 
     // The rangeObject gets messed up by our DOM changes. Be kind and restore.
@@ -211,9 +211,9 @@ function setRangeToTextNodes(rangeObject) {
 
 
 // Replace [node] with a constructed node</span>
-function highlightNode(node, highlightCallback) {
+function highlightNode(node, index, highlightCallback) {
     // Create a highlight
-    var highlight  = highlightCallback(node);
+    var highlight  = highlightCallback(node, index);
 
     // Wrap it around the text node
     node.parentNode.replaceChild(highlight, node);
