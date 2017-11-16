@@ -30,17 +30,18 @@
                     selection.removeAllRanges();
                 }
                 if (evt.target.matches('#CustomFunction')) {
-                    highlightRange(range, function (node) {
+                    highlightRange(range, function (node, index) {
                         var text = node.textContent;
+                        var node;
                         if (/^https?:\/\//.test(text)) {
-                            var a = document.createElement('a');
-                            a.href = text;
-                            a.classList.add('custom-function')
-                            return a;
+                            node = document.createElement('a');
+                            node.href = text;
+                        } else {
+                            node = document.createElement('span');
                         }
-                        var span = document.createElement('span');
-                        span.classList.add('custom-function');
-                        return span;
+                        node.classList.add('custom-function');
+                        node.dataset.highlightIndex = index;
+                        return node;
                     });
                     selection.removeAllRanges();
                 }
@@ -123,6 +124,13 @@
             background: rgba(76, 217, 100, 0.5);
         }
 
+        .custom-function[data-highlight-index]:before {
+            content: attr(data-highlight-index) ':';
+            background: rgba(76, 217, 100, 1);
+            padding: 0 0.25em;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 
@@ -168,17 +176,18 @@ highlightRange(range, mark);</pre>
                 <span>Element</span> instance, generally, an inline element. </p>
             <p>Try selecting the
                 <em>https://hipsum.co</em> text below.</p>
-            <pre>highlightRange(range, function (node) {
+            <pre>highlightRange(range, function (node, index) {
     var text = node.textContent;
+    var node;
     if (/^https?:\/\//.test(text)) {
-        var a = document.createElement('a');
-        a.href = text;
-        a.classList.add('custom-function')
-        return a;
+        node = document.createElement('a');
+        node.href = text;
+    } else {
+        node = document.createElement('span');
     }
-    var span = document.createElement('span');
-    span.classList.add('custom-function');
-    return span;
+    node.classList.add('custom-function');
+    node.dataset.highlightIndex = index;
+    return node;
 });</pre>
         </div>
     </nav>
